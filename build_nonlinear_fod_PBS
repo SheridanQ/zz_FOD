@@ -131,15 +131,13 @@ else
 	mkdir -p ${jobdir}
 fi
 ## preparing cmds
-cmd0="bash ${scripts}/get_mean_masked_average.sh ${outdir}/subjects.txt ${outdir}/subjects_masks.txt ${outdir}/fod_template_iter${count}.mif"
-#cmd1="sh2power ${outdir}/fod_template_iter${count}.mif ${outdir}/power_fod_template_iter${count}.nii.gz"
+cmd0="bash ${scripts}/get_mean_masked_average.sh ${outdir}/subjects.txt ${outdir}/subjects_masks.txt ${outdir}/fod_template_iter${count}.mif ${outdir}/fod_template_mask_iter${count}.mif"
 ### preparing jobs
 joblist="${jobdir}/joblist_avrg${count}.txt"
 jobname="avrg${count}"
 jobscript="${jobdir}/job_${jobname}_qsub.sh"
 echo '#!/bin/bash'>${jobscript}
 echo ${cmd0}>>${jobscript}
-echo ${cmd1}>>${jobscript}
 echo ${jobname}>>${joblist}
 if [ ! -f ${outdir}/fod_template_iter${count}.mif ];then
 	bash ${utils}/submit_jobs_v9_wait ${joblist} ${ltime} 20G ${threads} ${jobdir} 1
@@ -185,7 +183,7 @@ do
 
     #SHAPE UPDATE
     ## average inverse
-    cmd="bash ${scripts}/get_mean_masked_average.sh ${outdir}/subjects_warps_inv.txt ${outdir}/subjects_wmmasks.txt ${outdir}/avrginvwarp_iter${count}.mif"
+    cmd="bash ${scripts}/get_mean_masked_average.sh ${outdir}/subjects_warps_inv.txt ${outdir}/subjects_wmmasks.txt ${outdir}/avrginvwarp_iter${count}.mif ${outdir}/avrginvwarp_mask_iter${count}.mif"
     cmd1="bash ${scripts}/convert_miftrans2ants.sh ${template_name} ${outdir}/avrginvwarp_iter${count}.mif ${fod} ${outdir}/avrginvwarp_iter${count}.nii.gz"
     joblist="${jobdir}/joblist_avrginvwarp.txt"
 	jobname="avrginvwarp${count}"
@@ -244,14 +242,12 @@ do
 	
 	## update template
 	let count=count+1
-	cmd="bash ${scripts}/get_mean_masked_average.sh ${outdir}/subjects_warped.txt ${outdir}/subjects_warped_dtimasks.txt ${outdir}/fod_template_iter${count}.mif"
-	cmd1="sh2power ${outdir}/fod_template_iter${count}.mif ${outdir}/power_fod_template_iter${count}.nii.gz"
+	cmd="bash ${scripts}/get_mean_masked_average.sh ${outdir}/subjects_warped.txt ${outdir}/subjects_warped_dtimasks.txt ${outdir}/fod_template_iter${count}.mif ${outdir}/fod_template_mask_iter${count}.mif"
 	joblist="${jobdir}/joblist_avrg${count}.txt"
 	jobname="avrg${count}"
 	jobscript="${jobdir}/job_${jobname}_qsub.sh"
 	echo '#!/bin/bash'>${jobscript}
 	echo ${cmd}>>${jobscript}
-	#echo ${cmd1}>>${jobscript}
 	echo ${jobname}>>${joblist}
 
 	bash ${utils}/submit_jobs_v9_wait ${joblist} ${ltime} 20G ${threads} ${jobdir} 1
@@ -259,7 +255,6 @@ do
 
 done
 
-mrconvert ${outdir}/mask_sum.mif ${outdir}/mask_sum.nii.gz
-fslmaths ${outdir}/mask_sum.nii.gz -div ${nfods} -thr 0.5 -bin ${outdir}/fod_template_mask.nii.gz
-bash ${utils}/mul_images.sh ${outdir}/fod_template_iter${count}.mif ${outdir}/fod_template_mask.nii.gz ${outdir}/fod_template.nii.gz
+mrconvert ${outdir}/fod_template_iter${count}.mif ${outdir}/fod_template.nii.gz
+mrconvert ${outdir}/fod_template_mask_iter${count}.mif ${outdir}/fod_template_mask.nii.gz
 

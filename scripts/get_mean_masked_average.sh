@@ -4,6 +4,7 @@
 BASEDIR=$(dirname $0)
 sum="${BASEDIR}/../utils/sum_images.sh"
 div="${BASEDIR}/../utils/div_images.sh"
+mul="${BASEDIR}/../utils/mul_images.sh"
 
 if [ $# -lt 3 ]
 then
@@ -15,6 +16,7 @@ fi
 subj_list=${1}
 mask_list=${2}
 mmtemplate=${3} # mean masked template
+mmtemplatemask=${4}
 
 outdir=$(dirname ${mmtemplate})
 
@@ -27,8 +29,12 @@ tmpdir=${outdir}/tmp_${RANDOM}_${RANDOM}_${RANDOM}_$$
 
 #cmds
 bash ${sum} ${subj_list} ${tmpdir}/fod_sum.mif
-bash ${sum} ${mask_list} ${outdir}/mask_sum.mif
-bash ${div} ${tmpdir}/fod_sum.mif ${outdir}/mask_sum.mif ${mmtemplate}
+bash ${sum} ${mask_list} ${tmpdir}/mask_sum.mif
+number=`cat ${subj_list} | wc -l`
+
+mrcalc ${tmpdir}/mask_sum.mif ${number} -div 0.5 -gt 1 0 -if ${mmtemplatemask}
+bash ${div} ${tmpdir}/fod_sum.mif ${tmpdir}/mask_sum.mif ${tmpdir}/fod_sum_masked.mif
+bash ${mul} ${tmpdir}/fod_sum_masked.mif ${mmtemplatemask} ${mmtemplate}
 
 # clean up
 rm -rf ${tmpdir}
