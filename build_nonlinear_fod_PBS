@@ -3,10 +3,10 @@
 # author: Xiaoxiao Qi
 # date: 02/05/2020
 
-if [ $# -lt 5 ]
+if [ $# -lt 9 ]
 then
 	echo "Instructions: The script tries to nonlinearly align FOD images."
-	echo "Usage: `basement $0` foddir maskdir wmmaskdir outdir zigzag(in the multi-zigzag process)"
+	echo "Usage: `basement $0` foddir maskdir wmmaskdir outdir zigzag(in the multi-zigzag process) ultimate_space raw_fod raw_dti_mask raw_wm_mask"
 	echo "foddir: a folder contains only fods."
 	echo "maskdir: a folder contains only mask."
 	echo "wmmaskdir: a folder contains only wm masks"
@@ -31,6 +31,10 @@ maskdir=`realpath $2`
 wmmaskdir=`realpath $3`
 outdir=`realpath $4`
 zigzag=$5
+ultimate_space=$6
+raw_foddir=$7
+raw_dti_maskdir=$8
+raw_wm_maskdir=$9
 
 # iterative registration parameters
 Niter=1
@@ -98,6 +102,9 @@ do
     echo "${outdir}/${purename}*_warped.mif" >> ${outdir}/subjects_warped.txt
     echo "${outdir}/${purename}*_warp_su.mif" >> ${outdir}/subjects_warp_su.txt
     #echo "${outdir}/${purename}_warp_inv.nii.gz" >> ${outdir}/subjects_warps_inv_ants.txt
+
+    echo "${outdir}/${purename}*warped_dtimask.nii.gz" >>${outdir}/subjects_warped_dtimasks.txt
+    echo "${outdir}/${purename}*warped_wmmask.nii.gz" >>${outdir}/subjects_warped_wmmasks.txt
 	let num=num+1
 done
 
@@ -125,7 +132,7 @@ else
 fi
 ## preparing cmds
 cmd0="bash ${scripts}/get_mean_masked_average.sh ${outdir}/subjects.txt ${outdir}/subjects_masks.txt ${outdir}/fod_template_iter${count}.mif"
-cmd1="sh2power ${outdir}/fod_template_iter${count}.mif ${outdir}/power_fod_template_iter${count}.nii.gz"
+#cmd1="sh2power ${outdir}/fod_template_iter${count}.mif ${outdir}/power_fod_template_iter${count}.nii.gz"
 ### preparing jobs
 joblist="${jobdir}/joblist_avrg${count}.txt"
 jobname="avrg${count}"
@@ -134,7 +141,7 @@ echo '#!/bin/bash'>${jobscript}
 echo ${cmd0}>>${jobscript}
 echo ${cmd1}>>${jobscript}
 echo ${jobname}>>${joblist}
-if [ ! -f ${outdir}/power_fod_template_iter${count}.nii.gz ];then
+if [ ! -f ${outdir}/fod_template_iter${count}.mif ];then
 	bash ${utils}/submit_jobs_v9_wait ${joblist} ${ltime} 20G ${threads} ${jobdir} 1
 fi
 
@@ -187,10 +194,11 @@ do
 	echo ${cmd}>>${jobscript}
 	echo ${cmd1}>>${jobscript}
 	echo ${jobname}>>${joblist}
-	#if [ ! -f ${outdir}/avrginvwarp_iter${count}.mif ];then
-	bash ${utils}/submit_jobs_v9_wait ${joblist} ${ltime} 8G ${threads} ${jobdir} 1
-	#fi
+	if [ ! -f ${outdir}/avrginvwarp_iter${count}.mif ];then
+		bash ${utils}/submit_jobs_v9_wait ${joblist} ${ltime} 8G ${threads} ${jobdir} 1
+	fi
 	## mask the inverse file to generate shape update and apply it to subjects
+	
 	for (( i=0; i<$nfods; i++ ))
 	do
 		fod=${fods_list[$i]}
@@ -202,13 +210,20 @@ do
 
         bsname=${filename%_fod_deformed}
 
+        rawfod="${raw_foddir}/${bsname}_fod.mif"
+        raw_dti_mask="${raw_dti_maskdir}/${bsname}_*_mask.nii.gz"
+        raw_wm_mask="${raw_wm_maskdir}/${bsname}_*_mask.nii.gz"
+
         # cmd1="bash ${utils}/mul_images.sh ${outdir}/avrginvwarp_iter${count}.mif ${wmmask} ${outdir}/${filename}_warp_su.mif"
         # cmd2="bash ${scripts}/convert_miftrans2ants.sh ${template_name} ${outdir}/${filename}_warp_su.mif ${fod} ${outdir}/${filename}_warp_su.nii.gz"
         # cmd3="transformcompose -template ${template_name} ${outdir}/${filename}_warp.mif ${outdir}/${filename}_warp_su.mif ${outdir}/${filename}_warp_comb.mif -nthreads ${threads} -force -datatype float32"
         # cmd4="mrtransform -warp ${outdir}/${filename}_warp_comb.mif -template ${template_name} ${fod} ${outdir}/${filename}_warped.mif -nthreads ${threads} -force -datatype float32"
         cmd1="bash ${utils}/mul_images.sh ${outdir}/avrginvwarp_iter${count}.nii.gz ${wmmask} ${outdir}/${filename}_warp_su.nii.gz"
         cmd2="trans=\`bash /data/ywu94/Final_template/scripts/Get_previous_transformations.sh ${bsname} ${zigzag} FOD\`"
-        cmd3="bash ${scripts}/trans2fod.sh ${fod} \"\${trans}\" ${outdir}/power_fod_template_iter${count}.nii.gz ${outdir}/${filename}_warped.mif"
+        # cmd3="bash ${scripts}/trans2fod.sh ${fod} \"-t ${outdir}/${filename}_warp_su.nii.gz -t ${outdir}/${filename}_warp.nii.gz \${trans}\" ${outdir}/power_fod_template_iter${count}.nii.gz ${outdir}/${filename}_warped.mif"
+        cmd3="bash ${scripts}/trans2fod.sh ${rawfod} \"-t ${outdir}/${filename}_warp_su.nii.gz -t ${outdir}/${filename}_warp.nii.gz \${trans}\" ${ultimate_space} ${outdir}/${filename}_warped.mif"
+        cmd4="antsApplyTransforms -d 3 --verbose 1 -i ${raw_dti_mask} -r ${ultimate_space} -t ${outdir}/${filename}_warp_su.nii.gz -t ${outdir}/${filename}_warp.nii.gz \${trans} -o ${outdir}/${filename}_warped_dtimask.nii.gz -n GenericLabel"
+        cmd5="antsApplyTransforms -d 3 --verbose 1 -i ${raw_wm_mask} -r ${ultimate_space} -t ${outdir}/${filename}_warp_su.nii.gz -t ${outdir}/${filename}_warp.nii.gz \${trans} -o ${outdir}/${filename}_warped_wmmask.nii.gz -n GenericLabel"
 
         joblist="${jobdir}/joblist_update.txt"
         jobname="fod_su${count}_${i}"
@@ -217,6 +232,8 @@ do
         echo ${cmd1}>>${jobscript}
         echo ${cmd2}>>${jobscript}
         echo ${cmd3}>>${jobscript}
+        echo ${cmd4}>>${jobscript}
+        echo ${cmd5}>>${jobscript}
         echo "${jobname}">>${joblist}
 	done
 	
@@ -227,14 +244,14 @@ do
 	
 	## update template
 	let count=count+1
-	cmd="bash ${scripts}/get_mean_masked_average.sh ${outdir}/subjects_warped.txt ${outdir}/subjects_masks.txt ${outdir}/fod_template_iter${count}.mif"
+	cmd="bash ${scripts}/get_mean_masked_average.sh ${outdir}/subjects_warped.txt ${outdir}/subjects_warped_dtimasks.txt ${outdir}/fod_template_iter${count}.mif"
 	cmd1="sh2power ${outdir}/fod_template_iter${count}.mif ${outdir}/power_fod_template_iter${count}.nii.gz"
 	joblist="${jobdir}/joblist_avrg${count}.txt"
 	jobname="avrg${count}"
 	jobscript="${jobdir}/job_${jobname}_qsub.sh"
 	echo '#!/bin/bash'>${jobscript}
 	echo ${cmd}>>${jobscript}
-	echo ${cmd1}>>${jobscript}
+	#echo ${cmd1}>>${jobscript}
 	echo ${jobname}>>${joblist}
 
 	bash ${utils}/submit_jobs_v9_wait ${joblist} ${ltime} 20G ${threads} ${jobdir} 1
