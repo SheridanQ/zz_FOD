@@ -9,3 +9,5 @@ then
 fi
 
 mrcalc ${fac1} ${fac2} -mul ${product} -force -nthreads 0
+# clean finite numbers
+mrcalc ${product} -finite ${product} 0 -if ${product} -force -nthreads 0

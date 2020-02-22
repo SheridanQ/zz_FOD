@@ -9,3 +9,6 @@ then
 fi
 
 mrcalc ${num} ${dom} -div ${div} -force -nthreads 0
+
+# clean up finite numbers
+mrcalc ${div} -finite ${div} 0 -if ${div} -force -nthreads 0
