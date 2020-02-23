@@ -39,6 +39,11 @@ done
 
 warpcorrect ${tmpdir}/mrtrix_warp[].nii ${tmpdir}/mrtrix_warp_corrected.mif -nthreads 1
 
-mrtransform ${fod} -warp ${tmpdir}/mrtrix_warp_corrected.mif ${outfod} -force -nthreads 1
+mrtransform ${fod} -warp ${tmpdir}/mrtrix_warp_corrected.mif ${tmpdir}/original_transformed_fod.mif -force -nthreads 1
+
+strides=`mrinfo -stride ${target} | cut -d ' ' -f 1,2,3 | sed 's/ /,/g'`
+strides_fod="${strides},4"
+mrconvert ${tmpdir}/original_transformed_fod.mif ${outfod} -stride ${strides_fod}
+
 
 #rm -rf ${tmpdir}

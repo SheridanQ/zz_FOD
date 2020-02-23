@@ -37,5 +37,5 @@ bash ${div} ${tmpdir}/fod_sum.mif ${tmpdir}/mask_sum.mif ${tmpdir}/fod_sum_maske
 bash ${mul} ${tmpdir}/fod_sum_masked.mif ${mmtemplatemask} ${mmtemplate}
 
 # clean up
-rm -rf ${tmpdir}
+#rm -rf ${tmpdir}
 

@@ -96,15 +96,15 @@ do
 	echo ${maskdir}/${purename}_*.nii.gz >> ${outdir}/subjects_masks.txt
 	echo ${wmmaskdir}/${purename}_*.nii.gz >> ${outdir}/subjects_wmmasks.txt
 	## record anticipated outputs
-    echo "${outdir}/${purename}*_warp.mif" >> ${outdir}/subjects_warps.txt
-    echo "${outdir}/${purename}*_warp.nii.gz" >> ${outdir}/subjects_warps_ants.txt
-    echo "${outdir}/${purename}*_warp_inv.mif" >> ${outdir}/subjects_warps_inv.txt
-    echo "${outdir}/${purename}*_warped.mif" >> ${outdir}/subjects_warped.txt
-    echo "${outdir}/${purename}*_warp_su.mif" >> ${outdir}/subjects_warp_su.txt
+    echo "${outdir}/${purename}_*_warp.mif" >> ${outdir}/subjects_warps.txt
+    echo "${outdir}/${purename}_*_warp.nii.gz" >> ${outdir}/subjects_warps_ants.txt
+    echo "${outdir}/${purename}_*_warp_inv.mif" >> ${outdir}/subjects_warps_inv.txt
+    echo "${outdir}/${purename}_*_warped.mif" >> ${outdir}/subjects_warped.txt
+    echo "${outdir}/${purename}_*_warp_su.mif" >> ${outdir}/subjects_warp_su.txt
     #echo "${outdir}/${purename}_warp_inv.nii.gz" >> ${outdir}/subjects_warps_inv_ants.txt
 
-    echo "${outdir}/${purename}*warped_dtimask.nii.gz" >>${outdir}/subjects_warped_dtimasks.txt
-    echo "${outdir}/${purename}*warped_wmmask.nii.gz" >>${outdir}/subjects_warped_wmmasks.txt
+    echo "${outdir}/${purename}_*_warped_dtimask.nii.gz" >>${outdir}/subjects_warped_dtimasks.txt
+    echo "${outdir}/${purename}_*_warped_wmmask.nii.gz" >>${outdir}/subjects_warped_wmmasks.txt
 	let num=num+1
 done
 
@@ -139,9 +139,9 @@ jobscript="${jobdir}/job_${jobname}_qsub.sh"
 echo '#!/bin/bash'>${jobscript}
 echo ${cmd0}>>${jobscript}
 echo ${jobname}>>${joblist}
-if [ ! -f ${outdir}/fod_template_iter${count}.mif ];then
+#if [ ! -f ${outdir}/fod_template_iter${count}.mif ];then
 	bash ${utils}/submit_jobs_v9_wait ${joblist} ${ltime} 20G ${threads} ${jobdir} 1
-fi
+#fi
 
 # main loop
 while [ ${count} -lt ${Niter} ] # start from 0
@@ -176,10 +176,10 @@ do
         echo ${jobname}>>${joblist}
     done
     
-    check_count_registrationresults=`ls -1 ${outdir}/*_warp.nii.gz 2>/dev/null | wc -l`
-    if [ ${check_count_registrationresults} -lt ${nfods} ];then
+    #check_count_registrationresults=`ls -1 ${outdir}/*_warp.nii.gz 2>/dev/null | wc -l`
+    #if [ ${check_count_registrationresults} -lt ${nfods} ];then
     	bash ${utils}/submit_jobs_v9_wait ${joblist} ${stime} 8G ${threads} ${jobdir} ${nfods}
-    fi
+    #fi
 
     #SHAPE UPDATE
     ## average inverse
@@ -192,9 +192,9 @@ do
 	echo ${cmd}>>${jobscript}
 	echo ${cmd1}>>${jobscript}
 	echo ${jobname}>>${joblist}
-	if [ ! -f ${outdir}/avrginvwarp_iter${count}.mif ];then
+	#if [ ! -f ${outdir}/avrginvwarp_iter${count}.mif ];then
 		bash ${utils}/submit_jobs_v9_wait ${joblist} ${ltime} 8G ${threads} ${jobdir} 1
-	fi
+	#fi
 	## mask the inverse file to generate shape update and apply it to subjects
 	
 	for (( i=0; i<$nfods; i++ ))
