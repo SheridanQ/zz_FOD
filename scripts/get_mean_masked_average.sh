@@ -6,9 +6,9 @@ sum="${BASEDIR}/../utils/sum_images.sh"
 div="${BASEDIR}/../utils/div_images.sh"
 mul="${BASEDIR}/../utils/mul_images.sh"
 
-if [ $# -lt 3 ]
+if [ $# -lt 4 ]
 then
-	echo "Usage: `basement $0` subj_list mask_list mmtemplate"
+	echo "Usage: `basement $0` subj_list mask_list mmtemplate mmtemplatemask"
 	exit
 fi
 

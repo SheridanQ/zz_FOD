@@ -17,6 +17,6 @@ echo ${string}
 
 mrmath ${string} mean ${mean} -force -nthreads 0
 
-#clean up finite values
-mrcalc ${mean} -finite ${mean} 0 -if ${mean} -force -nthreads 0
+#clean up finite values 
+#mrcalc ${mean} -finite ${mean} 0 -if ${mean} -force -nthreads 0
 

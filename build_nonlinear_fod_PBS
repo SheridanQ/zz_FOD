@@ -96,15 +96,15 @@ do
 	echo ${maskdir}/${purename}_*.nii.gz >> ${outdir}/subjects_masks.txt
 	echo ${wmmaskdir}/${purename}_*.nii.gz >> ${outdir}/subjects_wmmasks.txt
 	## record anticipated outputs
-    echo "${outdir}/${purename}_*_warp.mif" >> ${outdir}/subjects_warps.txt
-    echo "${outdir}/${purename}_*_warp.nii.gz" >> ${outdir}/subjects_warps_ants.txt
-    echo "${outdir}/${purename}_*_warp_inv.mif" >> ${outdir}/subjects_warps_inv.txt
-    echo "${outdir}/${purename}_*_warped.mif" >> ${outdir}/subjects_warped.txt
-    echo "${outdir}/${purename}_*_warp_su.mif" >> ${outdir}/subjects_warp_su.txt
+    echo "${outdir}/${purename}_*warp.mif" >> ${outdir}/subjects_warps.txt
+    echo "${outdir}/${purename}_*warp.nii.gz" >> ${outdir}/subjects_warps_ants.txt
+    echo "${outdir}/${purename}_*warp_inv.mif" >> ${outdir}/subjects_warps_inv.txt
+    echo "${outdir}/${purename}_*warped.mif" >> ${outdir}/subjects_warped.txt
+    echo "${outdir}/${purename}_*warp_su.mif" >> ${outdir}/subjects_warp_su.txt
     #echo "${outdir}/${purename}_warp_inv.nii.gz" >> ${outdir}/subjects_warps_inv_ants.txt
 
-    echo "${outdir}/${purename}_*_warped_dtimask.nii.gz" >>${outdir}/subjects_warped_dtimasks.txt
-    echo "${outdir}/${purename}_*_warped_wmmask.nii.gz" >>${outdir}/subjects_warped_wmmasks.txt
+    echo "${outdir}/${purename}_*warped_dtimask.nii.gz" >>${outdir}/subjects_warped_dtimasks.txt
+    echo "${outdir}/${purename}_*warped_wmmask.nii.gz" >>${outdir}/subjects_warped_wmmasks.txt
 	let num=num+1
 done
 
@@ -123,7 +123,7 @@ fi
 # preparing inital template # can be changed later
 count=0 ##
 ## Preparing job folders
-jobdir="${outdir}/jobdir_iter${count}"
+jobdir="${outdir}/jobdir_init"
 if [ -d ${jobdir} ];then
 	rm -rf ${jobdir}
 	mkdir -p ${jobdir}

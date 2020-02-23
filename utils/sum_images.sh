@@ -18,4 +18,4 @@ echo ${string}
 mrmath ${string} sum ${sum} -force -nthreads 0
 
 #clean up finite numbers
-mrcalc ${sum} -finite ${sum} 0 -if ${sum} -force -nthreads 0
+#mrcalc ${sum} -finite ${sum} 0 -if ${sum} -force -nthreads 0
