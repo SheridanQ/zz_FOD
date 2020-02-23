@@ -43,7 +43,7 @@ mrtransform ${fod} -warp ${tmpdir}/mrtrix_warp_corrected.mif ${tmpdir}/original_
 
 strides=`mrinfo -stride ${target} | cut -d ' ' -f 1,2,3 | sed 's/ /,/g'`
 strides_fod="${strides},4"
-mrconvert ${tmpdir}/original_transformed_fod.mif ${outfod} -stride ${strides_fod}
+mrconvert ${tmpdir}/original_transformed_fod.mif ${outfod} -stride ${strides_fod} -force -nthreads 1
 
 
 rm -rf ${tmpdir}
