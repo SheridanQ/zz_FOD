@@ -183,7 +183,7 @@ do
 
     #SHAPE UPDATE
     ## average inverse
-    cmd="bash ${scripts}/get_mean_masked_average.sh ${outdir}/subjects_warps_inv.txt ${outdir}/subjects_wmmasks.txt ${outdir}/avrginvwarp_iter${count}.mif ${outdir}/avrginvwarp_mask_iter${count}.mif"
+    cmd="bash ${scripts}/get_mean_masked_average.sh ${outdir}/subjects_warps_inv.txt ${outdir}/subjects_masks.txt ${outdir}/avrginvwarp_iter${count}.mif ${outdir}/avrginvwarp_mask_iter${count}.mif"
     cmd1="bash ${scripts}/convert_miftrans2ants.sh ${template_name} ${outdir}/avrginvwarp_iter${count}.mif ${fod} ${outdir}/avrginvwarp_iter${count}.nii.gz"
     joblist="${jobdir}/joblist_avrginvwarp.txt"
 	jobname="avrginvwarp${count}"
@@ -217,6 +217,7 @@ do
         # cmd3="transformcompose -template ${template_name} ${outdir}/${filename}_warp.mif ${outdir}/${filename}_warp_su.mif ${outdir}/${filename}_warp_comb.mif -nthreads ${threads} -force -datatype float32"
         # cmd4="mrtransform -warp ${outdir}/${filename}_warp_comb.mif -template ${template_name} ${fod} ${outdir}/${filename}_warped.mif -nthreads ${threads} -force -datatype float32"
         cmd1="bash ${utils}/mul_images.sh ${outdir}/avrginvwarp_iter${count}.nii.gz ${wmmask} ${outdir}/${filename}_warp_su.nii.gz"
+        cmd11="mrcalc ${outdir}/${filename}_warp_su.nii.gz -finite ${outdir}/${filename}_warp_su.nii.gz 0 -if ${outdir}/${filename}_warp_su.nii.gz -force -nthreads 1"
         cmd2="trans=\`bash /data/ywu94/Final_template/scripts/Get_previous_transformations.sh ${bsname} ${zigzag} FOD\`"
         # cmd3="bash ${scripts}/trans2fod.sh ${fod} \"-t ${outdir}/${filename}_warp_su.nii.gz -t ${outdir}/${filename}_warp.nii.gz \${trans}\" ${outdir}/power_fod_template_iter${count}.nii.gz ${outdir}/${filename}_warped.mif"
         cmd3="bash ${scripts}/trans2fod.sh ${rawfod} \"-t ${outdir}/${filename}_warp_su.nii.gz -t ${outdir}/${filename}_warp.nii.gz \${trans}\" ${ultimate_space} ${outdir}/${filename}_warped.mif"
@@ -228,6 +229,7 @@ do
         jobscript="${jobdir}/job_${jobname}_qsub.sh"
         echo '#!/bin/bash'>${jobscript}
         echo ${cmd1}>>${jobscript}
+        echo ${cmd11}>>${jobscript}
         echo ${cmd2}>>${jobscript}
         echo ${cmd3}>>${jobscript}
         echo ${cmd4}>>${jobscript}
