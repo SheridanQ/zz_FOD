@@ -139,9 +139,9 @@ jobscript="${jobdir}/job_${jobname}_qsub.sh"
 echo '#!/bin/bash'>${jobscript}
 echo ${cmd0}>>${jobscript}
 echo ${jobname}>>${joblist}
-#if [ ! -f ${outdir}/fod_template_iter${count}.mif ];then
+if [ ! -f ${outdir}/fod_template_iter${count}.mif ];then
 	bash ${utils}/submit_jobs_v9_wait ${joblist} ${ltime} 20G ${threads} ${jobdir} 1
-#fi
+fi
 
 # main loop
 while [ ${count} -lt ${Niter} ] # start from 0
@@ -192,15 +192,16 @@ do
 	echo ${cmd}>>${jobscript}
 	echo ${cmd1}>>${jobscript}
 	echo ${jobname}>>${joblist}
-	#if [ ! -f ${outdir}/avrginvwarp_iter${count}.mif ];then
+	if [ ! -f ${outdir}/avrginvwarp_iter${count}.mif ];then
 		bash ${utils}/submit_jobs_v9_wait ${joblist} ${ltime} 8G ${threads} ${jobdir} 1
-	#fi
+	fi
 	## mask the inverse file to generate shape update and apply it to subjects
 	
 	for (( i=0; i<$nfods; i++ ))
 	do
 		fod=${fods_list[$i]}
 		wmmask=${wmmasks_list[$i]}
+		mask=${masks_list[$i]}
 
 		filename=$(basename "${fod}")
         extension="${filename##*.}"
@@ -216,24 +217,29 @@ do
         # cmd2="bash ${scripts}/convert_miftrans2ants.sh ${template_name} ${outdir}/${filename}_warp_su.mif ${fod} ${outdir}/${filename}_warp_su.nii.gz"
         # cmd3="transformcompose -template ${template_name} ${outdir}/${filename}_warp.mif ${outdir}/${filename}_warp_su.mif ${outdir}/${filename}_warp_comb.mif -nthreads ${threads} -force -datatype float32"
         # cmd4="mrtransform -warp ${outdir}/${filename}_warp_comb.mif -template ${template_name} ${fod} ${outdir}/${filename}_warped.mif -nthreads ${threads} -force -datatype float32"
-        cmd1="bash ${utils}/mul_images.sh ${outdir}/avrginvwarp_iter${count}.nii.gz ${wmmask} ${outdir}/${filename}_warp_su.nii.gz"
-        cmd11="mrcalc ${outdir}/${filename}_warp_su.nii.gz -finite ${outdir}/${filename}_warp_su.nii.gz 0 -if ${outdir}/${filename}_warp_su.nii.gz -force -nthreads 1"
-        cmd2="trans=\`bash /data/ywu94/Final_template/scripts/Get_previous_transformations.sh ${bsname} ${zigzag} FOD\`"
+        cmd0="bash ${utils}/mul_images.sh ${outdir}/avrginvwarp_iter${count}.nii.gz ${mask} ${outdir}/${filename}_warp_su_masked.nii.gz"
+        cmd1="mrcalc ${outdir}/${filename}_warp_su_masked.nii.gz -finite ${outdir}/${filename}_warp_su_masked.nii.gz 0 -if ${outdir}/${filename}_warp_su_masked.nii.gz -force -nthreads 1"
+        cmd2="bash ${utils}/mul_images.sh ${outdir}/${filename}_warp.nii.gz ${mask} ${outdir}/${filename}_warp_masked.nii.gz"
+       	cmd3="mrcalc ${outdir}/${filename}_warp_masked.nii.gz -finite ${outdir}/${filename}_warp_masked.nii.gz 0 -if ${outdir}/${filename}_warp_masked.nii.gz -force -nthreads 1"
+        
+        cmd4="trans=\`bash /data/ywu94/Final_template/scripts/Get_previous_transformations.sh ${bsname} ${zigzag} FOD\`"
         # cmd3="bash ${scripts}/trans2fod.sh ${fod} \"-t ${outdir}/${filename}_warp_su.nii.gz -t ${outdir}/${filename}_warp.nii.gz \${trans}\" ${outdir}/power_fod_template_iter${count}.nii.gz ${outdir}/${filename}_warped.mif"
-        cmd3="bash ${scripts}/trans2fod.sh ${rawfod} \"-t ${outdir}/${filename}_warp_su.nii.gz -t ${outdir}/${filename}_warp.nii.gz \${trans}\" ${ultimate_space} ${outdir}/${filename}_warped.mif"
-        cmd4="antsApplyTransforms -d 3 --verbose 1 -i ${raw_dti_mask} -r ${ultimate_space} -t ${outdir}/${filename}_warp_su.nii.gz -t ${outdir}/${filename}_warp.nii.gz \${trans} -o ${outdir}/${filename}_warped_dtimask.nii.gz -n GenericLabel"
-        cmd5="antsApplyTransforms -d 3 --verbose 1 -i ${raw_wm_mask} -r ${ultimate_space} -t ${outdir}/${filename}_warp_su.nii.gz -t ${outdir}/${filename}_warp.nii.gz \${trans} -o ${outdir}/${filename}_warped_wmmask.nii.gz -n GenericLabel"
+        cmd5="bash ${scripts}/trans2fod.sh ${rawfod} \"-t ${outdir}/${filename}_warp_su_masked.nii.gz -t ${outdir}/${filename}_warp_masked.nii.gz \${trans}\" ${ultimate_space} ${outdir}/${filename}_warped.mif"
+        cmd6="antsApplyTransforms -d 3 --verbose 1 -i ${raw_dti_mask} -r ${ultimate_space} -t ${outdir}/${filename}_warp_su_masked.nii.gz -t ${outdir}/${filename}_warp_masked.nii.gz \${trans} -o ${outdir}/${filename}_warped_dtimask.nii.gz -n GenericLabel"
+        cmd7="antsApplyTransforms -d 3 --verbose 1 -i ${raw_wm_mask} -r ${ultimate_space} -t ${outdir}/${filename}_warp_su_masked.nii.gz -t ${outdir}/${filename}_warp_masked.nii.gz \${trans} -o ${outdir}/${filename}_warped_wmmask.nii.gz -n GenericLabel"
 
         joblist="${jobdir}/joblist_update.txt"
         jobname="fod_su${count}_${i}"
         jobscript="${jobdir}/job_${jobname}_qsub.sh"
         echo '#!/bin/bash'>${jobscript}
+        echo ${cmd0}>>${jobscript}
         echo ${cmd1}>>${jobscript}
-        echo ${cmd11}>>${jobscript}
         echo ${cmd2}>>${jobscript}
         echo ${cmd3}>>${jobscript}
         echo ${cmd4}>>${jobscript}
         echo ${cmd5}>>${jobscript}
+        echo ${cmd6}>>${jobscript}
+        echo ${cmd7}>>${jobscript}
         echo "${jobname}">>${joblist}
 	done
 	
@@ -257,6 +263,6 @@ do
 
 done
 
-mrconvert ${outdir}/fod_template_iter${count}.mif ${outdir}/fod_template.nii.gz
-mrconvert ${outdir}/fod_template_mask_iter${count}.mif ${outdir}/fod_template_mask.nii.gz
+mrconvert ${outdir}/fod_template_iter${Niter}.mif ${outdir}/fod_template.nii.gz
+mrconvert ${outdir}/fod_template_mask_iter${Niter}.mif ${outdir}/fod_template_mask.nii.gz
 

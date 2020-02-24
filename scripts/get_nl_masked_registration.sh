@@ -34,14 +34,14 @@ bash ${mul} ${target_template} ${moving_mask} ${tmpdir}/template_masked.mif
 
 # registration
 # keep the mif warp files.
-mrregister ${tmpdir}/fod_masked.mif ${tmpdir}/template_masked.mif \
-			-type nonlinear \
-			-nl_warp ${outdir}/${filename}_warp.mif ${outdir}/${filename}_warp_inv.mif \
-			-transformed ${outdir}/${filename}_warped.mif \
-			-mask1 ${moving_mask} \
-			-mask2 ${moving_mask} \
-			-nthreads ${threads} \
-			-datatype float32 -force
+# mrregister ${tmpdir}/fod_masked.mif ${tmpdir}/template_masked.mif \
+# 			-type nonlinear \
+# 			-nl_warp ${outdir}/${filename}_warp.mif ${outdir}/${filename}_warp_inv.mif \
+# 			-transformed ${outdir}/${filename}_warped.mif \
+# 			-mask1 ${moving_mask} \
+# 			-mask2 ${moving_mask} \
+# 			-nthreads ${threads} \
+# 			-datatype float32 -force
 #bash ${mul} ${outdir}/${filename}_warp.mif ${moving_mask} ${outdir}/${filename}_warp.mif
 #bash ${mul} ${outdir}/${filename}_warp_inv.mif ${moving_mask} ${outdir}/${filename}_warp_inv.mif
 

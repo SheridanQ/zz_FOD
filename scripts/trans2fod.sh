@@ -46,4 +46,4 @@ strides_fod="${strides},4"
 mrconvert ${tmpdir}/original_transformed_fod.mif ${outfod} -stride ${strides_fod} -force -nthreads 1
 
 
-rm -rf ${tmpdir}
+#rm -rf ${tmpdir}
