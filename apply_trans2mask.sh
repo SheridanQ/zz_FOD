@@ -2,8 +2,8 @@
 scriptsdir=/data/ywu94/Final_template/scripts
 
 
-if [ $# -lt 5 ];then
-	echo "Usage: `basename $0` uid.list original_mask_folder transformation_folder out_folder target_template"
+if [ $# -lt 6 ];then
+	echo "Usage: `basename $0` uid.list original_mask_folder transformation_folder out_folder target_template mode"
 	exit
 fi
 
@@ -13,6 +13,7 @@ maskdir=${2}
 deformeddir=${3}
 zigzag=${4}
 target=${5}
+mode=${6}
 
 
 jobdir="${deformeddir}/jobdir_mask_apply"
@@ -29,8 +30,8 @@ rm -f ${joblist}
 
 for uid in `cat ${uidlist}`
 do
-	mask="${maskdir}/${uid}_*_mask.nii.gz"
-	trans=`bash ${scriptsdir}/Get_previous_transformations.sh ${uid} ${zigzag} FOD`
+	mask="${maskdir}/${uid}_*.nii*"
+	trans=`bash ${scriptsdir}/Get_previous_transformations.sh ${uid} ${zigzag} ${mode}`
 	deformed="${deformeddir}/${uid}_mask_deformed.nii.gz"
 
 	cmd="antsApplyTransforms -i ${mask} -o ${deformed} -r ${target} ${trans} -n GenericLabel"

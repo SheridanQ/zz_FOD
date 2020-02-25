@@ -20,6 +20,7 @@ out_disp = sys.argv[3]
 disp4D = nib.load(disp_mrtrix)
 dummy_disp = nib.load(dummy_disp)
 dummy_header = dummy_disp.header.copy()
+dummy_header.set_intent(1007)
 
 x_dim,y_dim,z_dim,t_dim=disp4D.get_data().shape
 disp5D=np.zeros((x_dim,y_dim,z_dim,1,t_dim)).astype(np.float64)

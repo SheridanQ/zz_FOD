@@ -30,12 +30,11 @@ tmpdir=${outdir}/tmp_${filename}
 
 warpinit ${fod} ${tmpdir}/identity_warp[].nii.gz
 
-antsApplyTransforms -d 3 --verbose 1 -i ${tmpdir}/identity_warp0.nii.gz ${trans} -r ${target} -o [${tmpdir}/combtrans.nii.gz,1]
+antsApplyTransforms -d 3 --verbose 1 --float 1 -i ${tmpdir}/identity_warp0.nii.gz ${trans} -r ${target} -o [${tmpdir}/combtrans.nii.gz,1]
 for i in {0..2}
 do
-	antsApplyTransforms -i ${tmpdir}/identity_warp${i}.nii.gz -t ${tmpdir}/combtrans.nii.gz -r ${target} -o ${tmpdir}/mrtrix_warp${i}.nii.gz
+	antsApplyTransforms --float 1 -i ${tmpdir}/identity_warp${i}.nii.gz -t ${tmpdir}/combtrans.nii.gz -r ${target} -o ${tmpdir}/mrtrix_warp${i}.nii.gz
 done
-
 
 warpcorrect ${tmpdir}/mrtrix_warp[].nii ${tmpdir}/mrtrix_warp_corrected.mif -nthreads 1
 
@@ -46,4 +45,4 @@ strides_fod="${strides},4"
 mrconvert ${tmpdir}/original_transformed_fod.mif ${outfod} -stride ${strides_fod} -force -nthreads 1
 
 
-#rm -rf ${tmpdir}
+rm -rf ${tmpdir}
