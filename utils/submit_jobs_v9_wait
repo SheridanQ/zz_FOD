@@ -4,12 +4,12 @@
 trap control_c SIGINT
 
 #setwd="/home/xqi10/BEEs_playground/1-T1_template_spnorm" #edit this
-if [ $# -lt 5 ]
+if [ $# -lt 6 ]
 then
 	echo "This version has a flag for indicating how many jobs per batch. like I/O heavy jobs."
 	echo "This script is for running those command has reg suffix (not population, not sn)"
 	echo "==============================================================================="
-	echo "usage: `basename $0` jobnameonly_list walltime(00:00:00) qmem ppn workdir upperlmt_No_jobs_per_batches"
+	echo "usage: `basename $0` jobnameonly_list walltime(00:00:00) qmem ppn workdir upperlmt_No_jobs_per_batches debug"
 	echo "==============================================================================="
 	echo "The standard job submition tool. Xiaoxiao Qi"
 	exit 1
@@ -43,8 +43,16 @@ setwd=$5
 cd $setwd
 setwd=$PWD
 den=$6
+debug=$7
 
-
+if [ $debug -eq "1" ];then
+	echo "Debug mode [on]: Job scripts generated but not submitted."
+	exit
+elif [ $debug -eq "0" ];then
+	echo "Debug mode [off]: Starting..."
+else
+	echo "Debug mode not activated. Starting by default..."
+fi
 
 cont=`expr ${number_of_lines} / ${den}` #number of batches not including the remainders
 
