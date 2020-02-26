@@ -83,9 +83,9 @@ while( $jobsIncomplete )
        
         if( $verbose )
           {
-	  print "    Job $job is in state $tokens[$statePos]\n";
-	  }
-	}
+    print "    Job $job is in state $tokens[$statePos]\n";
+    }
+  }
       last qstatLine if ( @tokens > 0 && ( $tokens[$jobID_Pos] =~ m/$job_short/ ) );
       }
     }

@@ -8,8 +8,8 @@ mul="${BASEDIR}/../utils/mul_images.sh"
 
 if [ $# -lt 3 ]
 then
-	echo "Usage: `basement $0` subj_list mask_list mmtemplate"
-	exit
+    echo "Usage: `basement $0` subj_list mask_list mmtemplate"
+    exit
 fi
 
 # parsing inputs
@@ -22,8 +22,8 @@ outdir=$(dirname ${mmtemplate})
 # protect env
 tmpdir=${outdir}/tmp_${RANDOM}_${RANDOM}_${RANDOM}_$$
 (umask 077 && mkdir ${tmpdir}) || {
-	echo "Could not create temporary directory! Exiting." 1>&2
-	exit 1
+    echo "Could not create temporary directory! Exiting." 1>&2
+    exit 1
 }
 
 #cmds

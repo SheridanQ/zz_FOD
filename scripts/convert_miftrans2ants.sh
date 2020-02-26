@@ -7,9 +7,9 @@ tool_dummy="${BASEDIR}/../utils/make_dummy_header_ANTs.sh"
 tool_df2dp="${BASEDIR}/../utils/def2disp_with_dummy.py"
 
 if [ $# -lt 4 ];then
-	echo "`basename ${0}` fod_source FOD_warp_mif fod_target out_fod_displacement"
-	echo "The FOD transformation should be used with MRtrix303 (.mif)"
-	exit
+    echo "`basename ${0}` fod_source FOD_warp_mif fod_target out_fod_displacement"
+    echo "The FOD transformation should be used with MRtrix303 (.mif)"
+    exit
 fi
 
 fod_source=${1}
@@ -20,8 +20,8 @@ outdp=${4}
 outdir=`dirname ${outdp}`
 tmpdir=${outdir}/tmp_${RANDOM}_${RANDOM}_${RANDOM}_$$
 (umask 077 && mkdir ${tmpdir}) || {
-	echo "Could not create temporary directory! Exiting." 1>&2
-	exit 1
+    echo "Could not create temporary directory! Exiting." 1>&2
+    exit 1
 }
 
 #expected temporary files:

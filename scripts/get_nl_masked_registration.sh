@@ -9,8 +9,8 @@ convert="${BASEDIR}/convert_miftrans2ants.sh"
 
 if [ $# -lt 5 ]
 then
-	echo "Usage: `basename $0` moving_fod moving_mask target_template outdir threads"
-	exit
+    echo "Usage: `basename $0` moving_fod moving_mask target_template outdir threads"
+    exit
 fi
 
 moving_fod=$1
@@ -24,8 +24,8 @@ filename="${filename%.*}"
 
 tmpdir=${outdir}/tmp_${RANDOM}_${RANDOM}_${RANDOM}_$$
 (umask 077 && mkdir ${tmpdir}) || {
-	echo "Could not create temporary directory! Exiting." 1>&2
-	exit 1
+    echo "Could not create temporary directory! Exiting." 1>&2
+    exit 1
 }
 
 # apply restricted masking rules
@@ -35,17 +35,17 @@ bash ${mul} ${target_template} ${moving_mask} ${tmpdir}/template_masked.mif
 # registration
 # keep the mif warp files.
 mrregister ${tmpdir}/fod_masked.mif ${tmpdir}/template_masked.mif \
-			-type nonlinear \
-			-nl_warp ${outdir}/${filename}_warp.mif ${outdir}/${filename}_warp_inv.mif \
-			-transformed ${outdir}/${filename}_warped.mif \
-			-mask1 ${moving_mask} \
-			-mask2 ${moving_mask} \
-			-nthreads ${threads} \
-			-datatype float32 -force
+            -type nonlinear \
+            -nl_warp ${outdir}/${filename}_warp.mif ${outdir}/${filename}_warp_inv.mif \
+            -transformed ${outdir}/${filename}_warped.mif \
+            -mask1 ${moving_mask} \
+            -mask2 ${moving_mask} \
+            -nthreads ${threads} \
+            -datatype float32 -force
 
 # convert mif transformation to ants
 bash ${convert} ${moving_fod} ${outdir}/${filename}_warp.mif \
-	 ${target_template} ${outdir}/${filename}_warp.nii.gz
+     ${target_template} ${outdir}/${filename}_warp.nii.gz
 
 # clean up
 rm -rf ${tmpdir}

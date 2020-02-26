@@ -3,8 +3,8 @@ scriptsdir=/data/ywu94/Final_template/scripts
 
 
 if [ $# -lt 6 ];then
-	echo "Usage: `basename $0` uid.list original_mask_folder transformation_folder out_folder target_template mode"
-	exit
+    echo "Usage: `basename $0` uid.list original_mask_folder transformation_folder out_folder target_template mode"
+    exit
 fi
 
 uidlist=${1} #uid.list
@@ -30,21 +30,21 @@ rm -f ${joblist}
 
 for uid in `cat ${uidlist}`
 do
-	mask="${maskdir}/${uid}_*.nii*"
-	trans=`bash ${scriptsdir}/Get_previous_transformations.sh ${uid} ${zigzag} ${mode}`
-	deformed="${deformeddir}/${uid}_mask_deformed.nii.gz"
+    mask="${maskdir}/${uid}_*.nii*"
+    trans=`bash ${scriptsdir}/Get_previous_transformations.sh ${uid} ${zigzag} ${mode}`
+    deformed="${deformeddir}/${uid}_mask_deformed.nii.gz"
 
-	cmd="antsApplyTransforms -i ${mask} -o ${deformed} -r ${target} ${trans} -n GenericLabel"
+    cmd="antsApplyTransforms -i ${mask} -o ${deformed} -r ${target} ${trans} -n GenericLabel"
 
-	jobname="applymask_${count}"
-	jobscript="${jobdir}/job_${jobname}_qsub.sh"
-	
+    jobname="applymask_${count}"
+    jobscript="${jobdir}/job_${jobname}_qsub.sh"
+    
 
-	echo "#!/bin/bash" >${jobscript}
-	echo "${cmd}" >> ${jobscript}
-	echo "${jobname}" >> ${joblist}
+    echo "#!/bin/bash" >${jobscript}
+    echo "${cmd}" >> ${jobscript}
+    echo "${jobname}" >> ${joblist}
 
-	let count=count+1
+    let count=count+1
 done
 
 bash /data/ywu94/Final_template/scripts/zz_FOD/utils/submit_jobs_v9_wait ${joblist} 24:00:00 8G 1 ${jobdir} 101
