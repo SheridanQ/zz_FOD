@@ -157,7 +157,6 @@ do
 
 	cmd0="fslmaths ${mask} -mul ${t1wmask} ${outdir}/${filename}_fodmask.nii.gz -odt int"
 	cmd1="mrcalc ${fod} ${outdir}/${filename}_fodmask.nii.gz -multiply ${outdir}/${filename}_fodmasked.mif -force -nthreads 1"
-	cmd2="mrcalc ${outdir}/${filename}_fodmasked.mif -finite ${outdir}/${filename}_fodmasked.mif 0 -if ${outdir}/${filename}_fodmasked.mif -force -nthreads 1"
 
 	joblist="${jobdir}/joblist_fodmask.txt"
 	jobname="fodmask_${i}"
@@ -165,19 +164,16 @@ do
 	echo '#!/bin/bash'>${jobscript}
     echo ${cmd0}>>${jobscript}
     echo ${cmd1}>>${jobscript}
-    echo ${cmd2}>>${jobscript}
     echo ${jobname}>>${joblist}
 done
 bash ${utils}/submit_jobs_v9_wait ${joblist} ${stime} 8G ${threads} ${jobdir} ${nfods} ${debug_mode}
 ## get the initial template
 cmd0="bash ${scripts}/get_mean_masked_average.sh ${outdir}/subjects_fodmasked.txt ${outdir}/subjects_fodmasks.txt ${outdir}/fod_template_iter${count}.mif"
-cmd1="mrcalc ${outdir}/fod_template_iter${count}.mif -finite ${outdir}/fod_template_iter${count}.mif 0 -if ${outdir}/fod_template_iter${count}.mif -force -nthreads 1"
 joblist="${jobdir}/joblist_fodavrg.txt"
 jobname="avrgfod${count}"
 jobscript="${jobdir}/job_${jobname}_qsub.sh"
 echo '#!/bin/bash'>${jobscript}
 echo ${cmd0}>>${jobscript}
-echo ${cmd1}>>${jobscript}
 echo ${jobname}>>${joblist}
 bash ${utils}/submit_jobs_v9_wait ${joblist} ${stime} 8G ${threads} ${jobdir} 1 ${debug_mode}
 
@@ -297,7 +293,6 @@ do
 
 		cmd0="fslmaths ${outdir}/${bsname}_*warped_dtimask.nii.gz -mul ${outdir}/${bsname}_*warped_t1wmask.nii.gz ${outdir}/${filename}_fodmask.nii.gz -odt int"
 		cmd1="mrcalc ${outdir}/${filename}_warped.mif ${outdir}/${filename}_fodmask.nii.gz -multiply ${outdir}/${filename}_fodmasked.mif -force -nthreads 1"
-		cmd2="mrcalc ${outdir}/${filename}_fodmasked.mif -finite ${outdir}/${filename}_fodmasked.mif 0 -if ${outdir}/${filename}_fodmasked.mif -force -nthreads 1"
 
 		joblist="${jobdir}/joblist_fodmask.txt"
 		jobname="fodmask_${i}"
@@ -305,19 +300,16 @@ do
 		echo '#!/bin/bash'>${jobscript}
 	    echo ${cmd0}>>${jobscript}
 	    echo ${cmd1}>>${jobscript}
-	    echo ${cmd2}>>${jobscript}
 	    echo ${jobname}>>${joblist}
 	done
 	bash ${utils}/submit_jobs_v9_wait ${joblist} ${stime} 8G ${threads} ${jobdir} ${nfods} ${debug_mode}
 	## get the initial template
 	cmd0="bash ${scripts}/get_mean_masked_average.sh ${outdir}/subjects_fodmasked.txt ${outdir}/subjects_fodmasks.txt ${outdir}/fod_template_iter${count}.mif"
-	cmd1="mrcalc ${outdir}/fod_template_iter${count}.mif -finite ${outdir}/fod_template_iter${count}.mif 0 -if ${outdir}/fod_template_iter${count}.mif -force -nthreads 1"
 	joblist="${jobdir}/joblist_fodavrg.txt"
 	jobname="avrgfod${count}"
 	jobscript="${jobdir}/job_${jobname}_qsub.sh"
 	echo '#!/bin/bash'>${jobscript}
 	echo ${cmd0}>>${jobscript}
-	echo ${cmd1}>>${jobscript}
 	echo ${jobname}>>${joblist}
 	bash ${utils}/submit_jobs_v9_wait ${joblist} ${stime} 8G ${threads} ${jobdir} 1 ${debug_mode}
 done
