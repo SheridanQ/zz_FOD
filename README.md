@@ -6,7 +6,15 @@ This project is a part of a multi-modal template building approach, aiming to bu
 2. The `apply_trans2fod.sh`, `apply_trans2mask.sh` and `trans2fod.sh` are the helper functions for the initiation of the template building process.  
 3. This project also contains helper scripts for submitting jobs to PBS cluster.  
 
+## Python dependencies:
+`numpy`, `nibabel`
+
+## Software dependencies:
+[ANTs](https://github.com/ANTsX/ANTs), [MRtrix3](https://github.com/MRtrix3/mrtrix3)
+
 ## Evaluation 
 Developing...
+
 ## Author
-Xiaoxiao Qi, xqi10@hawk.iit.edu
+Xiaoxiao Qi, xqi10@hawk.iit.edu.  
+Shout out to Yingjuan, who advised me with the masking rules.
