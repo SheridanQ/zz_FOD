@@ -46,8 +46,8 @@ Niter=6
 njobs=202 # assuming 156 per person
 stime="24:00:00"
 ltime="48:00:00"
-threads=1 # multithreading only in registration
-nthreads="${threads}"
+thread=1 # multithreading only in registration
+nthreads=2
 
 debug_mode=0
 
@@ -166,7 +166,7 @@ do
     echo ${cmd1}>>${jobscript}
     echo ${jobname}>>${joblist}
 done
-bash ${utils}/submit_jobs_v9_wait ${joblist} ${stime} 8G ${threads} ${jobdir} ${nfods} ${debug_mode}
+bash ${utils}/submit_jobs_v9_wait ${joblist} ${stime} 8G ${thread} ${jobdir} ${nfods} ${debug_mode}
 ## get the initial template
 cmd0="bash ${scripts}/get_mean_masked_average.sh ${outdir}/subjects_fodmasked.txt ${outdir}/subjects_fodmasks.txt ${outdir}/fod_template_iter${count}.mif"
 joblist="${jobdir}/joblist_fodavrg.txt"
@@ -175,7 +175,7 @@ jobscript="${jobdir}/job_${jobname}_qsub.sh"
 echo '#!/bin/bash'>${jobscript}
 echo ${cmd0}>>${jobscript}
 echo ${jobname}>>${joblist}
-bash ${utils}/submit_jobs_v9_wait ${joblist} ${stime} 8G ${threads} ${jobdir} 1 ${debug_mode}
+bash ${utils}/submit_jobs_v9_wait ${joblist} ${stime} 8G ${thread} ${jobdir} 1 ${debug_mode}
 
 
 # main loop
@@ -215,7 +215,7 @@ do
     
     #check_count_registrationresults=`ls -1 ${outdir}/*_warp.nii.gz 2>/dev/null | wc -l`
     #if [ ${check_count_registrationresults} -lt ${nfods} ];then
-        bash ${utils}/submit_jobs_v9_wait ${joblist} ${stime} 8G ${threads} ${jobdir} ${nfods} ${debug_mode}
+        bash ${utils}/submit_jobs_v9_wait ${joblist} ${stime} 8G ${nthreads} ${jobdir} ${nfods} ${debug_mode}
     #fi
 
     #SHAPE UPDATE
@@ -230,7 +230,7 @@ do
     echo ${cmd1}>>${jobscript}
     echo ${jobname}>>${joblist}
     #if [ ! -f ${outdir}/avrginvwarp_iter${count}.mif ];then
-        bash ${utils}/submit_jobs_v9_wait ${joblist} ${ltime} 8G ${threads} ${jobdir} 1 ${debug_mode}
+        bash ${utils}/submit_jobs_v9_wait ${joblist} ${ltime} 8G ${thread} ${jobdir} 1 ${debug_mode}
     #fi
     ## mask the inverse file to generate shape update and apply it to subjects
     
@@ -277,7 +277,7 @@ do
     
 #   check_count_su=`ls -1 ${outdir}/*_warp_su.nii.gz 2>/dev/null | wc -l`
 #   if [ ${check_count_su} -lt ${nfods} ];then
-    bash ${utils}/submit_jobs_v9_wait ${joblist} ${stime} 8G ${threads} ${jobdir} ${nfods} ${debug_mode}
+    bash ${utils}/submit_jobs_v9_wait ${joblist} ${stime} 8G ${thread} ${jobdir} ${nfods} ${debug_mode}
 #   fi
     
     ## update template
@@ -302,7 +302,7 @@ do
         echo ${cmd1}>>${jobscript}
         echo ${jobname}>>${joblist}
     done
-    bash ${utils}/submit_jobs_v9_wait ${joblist} ${stime} 8G ${threads} ${jobdir} ${nfods} ${debug_mode}
+    bash ${utils}/submit_jobs_v9_wait ${joblist} ${stime} 8G ${thread} ${jobdir} ${nfods} ${debug_mode}
     ## get the initial template
     cmd0="bash ${scripts}/get_mean_masked_average.sh ${outdir}/subjects_fodmasked.txt ${outdir}/subjects_fodmasks.txt ${outdir}/fod_template_iter${count}.mif"
     joblist="${jobdir}/joblist_fodavrg.txt"
@@ -311,7 +311,7 @@ do
     echo '#!/bin/bash'>${jobscript}
     echo ${cmd0}>>${jobscript}
     echo ${jobname}>>${joblist}
-    bash ${utils}/submit_jobs_v9_wait ${joblist} ${stime} 8G ${threads} ${jobdir} 1 ${debug_mode}
+    bash ${utils}/submit_jobs_v9_wait ${joblist} ${stime} 8G ${thread} ${jobdir} 1 ${debug_mode}
 done
 
 mrconvert ${outdir}/fod_template_iter${Niter}.mif ${outdir}/fod_template.nii.gz
