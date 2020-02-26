@@ -220,7 +220,7 @@ do
 
     #SHAPE UPDATE
     ## average inverse
-    cmd="bash ${utils}/sum_images.sh ${outdir}/subjects_warps_inv.txt ${outdir}/avrginvwarp_iter${count}.mif"
+    cmd="bash ${utils}/average_images.sh ${outdir}/subjects_warps_inv.txt ${outdir}/avrginvwarp_iter${count}.mif"
     cmd1="bash ${scripts}/convert_miftrans2ants.sh ${template_name} ${outdir}/avrginvwarp_iter${count}.mif ${fod} ${outdir}/avrginvwarp_iter${count}.nii.gz"
     joblist="${jobdir}/joblist_avrginvwarp.txt"
 	jobname="avrginvwarp${count}"
